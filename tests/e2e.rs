@@ -19,7 +19,7 @@ fn exec_returns_exit_code_and_output_marked_test() {
     let mut m = with(&[]);
     let (r, err) = m.tool(
         "exec",
-        json!({"host":"local","project":"roma","command":"echo hi"}),
+        json!({"host":"local","project":"demo","command":"echo hi"}),
     );
     assert!(!err, "{r}");
     assert_eq!(r["exit_code"], 0);
@@ -34,13 +34,13 @@ fn session_is_reused_for_the_same_project() {
     let a = m
         .tool(
             "exec",
-            json!({"host":"local","project":"roma","command":"true"}),
+            json!({"host":"local","project":"demo","command":"true"}),
         )
         .0;
     let b = m
         .tool(
             "exec",
-            json!({"host":"local","project":"roma","command":"true"}),
+            json!({"host":"local","project":"demo","command":"true"}),
         )
         .0;
     assert_eq!(a["pane_id"], b["pane_id"]);

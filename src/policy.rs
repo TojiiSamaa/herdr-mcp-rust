@@ -111,7 +111,7 @@ mod tests {
     }
     #[test]
     fn names() {
-        assert!(valid_name("roma-2"));
+        assert!(valid_name("demo-2"));
         assert!(!valid_name("a b"));
         assert!(!valid_name(""));
     }

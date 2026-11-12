@@ -1,4 +1,4 @@
-//! The ONLY module allowed to touch sockets or spawn processes (checked by tests/static_egress.rs).
+//! The ONLY module allowed to touch sockets or spawn processes (checked by tests/egress.rs).
 //! In test mode `Real` is never constructed: `select` returns `Mock`.
 use crate::policy::Config;
 use crate::stats::Stats;

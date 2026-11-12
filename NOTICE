@@ -1,0 +1,6 @@
+herdr-mcp
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Herdr (https://github.com/herdrdev/herdr) is the work of its author, licensed under
+the Apache License, Version 2.0. This repository contains no Herdr code: herdr-mcp
+only talks to a running Herdr server over its Unix socket.
