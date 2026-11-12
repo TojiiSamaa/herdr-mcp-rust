@@ -18,18 +18,23 @@ jobs:
       - run: cargo build --release --target ${{ matrix.target }}
       - run: cp target/${{ matrix.target }}/release/herdr-mcp herdr-mcp-${{ matrix.name }}
       - uses: actions/upload-artifact@v4
-        with: { name: bin-${{ matrix.name }}, path: herdr-mcp-${{ matrix.name }} }
+        with:
+          name: bin-${{ matrix.name }}
+          path: herdr-mcp-${{ matrix.name }}
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
-        with: { path: dist, merge-multiple: true }
+        with:
+          path: dist
+          merge-multiple: true
       - name: notes = the CHANGELOG section of this version (fails if missing)
         run: |
           v="${GITHUB_REF_NAME}"
           awk -v v="$v" '$0 ~ "^## \\[" v "\\]" {f=1; next} /^## \[/ {f=0} f' CHANGELOG.md > notes.md
           test -s notes.md
       - run: gh release create "$GITHUB_REF_NAME" dist/* --title "$GITHUB_REF_NAME" --notes-file notes.md
-        env: { GH_TOKEN: "${{ github.token }}" }
+        env:
+          GH_TOKEN: ${{ github.token }}
