@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.3]
+- Tunnels to remote hosts open in parallel, in the background at startup, and no longer block each other (the lock is released while waiting for the socket; polling every 10 ms instead of 100 ms). Cold `hosts_list`: 706 ms to 105 ms.
+
 ## [1.0.2]
 - `exec` makes 2 Herdr calls instead of 5: the pane id is cached (looked up again once if stale) and the text returned by the wait is reused instead of a second read. Remote host: 528 ms to 215 ms.
 

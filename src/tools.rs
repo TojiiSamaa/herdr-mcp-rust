@@ -95,15 +95,21 @@ pub fn call(ctx: &Ctx, name: &str, a: &Value) -> (Value, bool) {
 }
 
 fn hosts_list(ctx: &Ctx) -> R {
-    let rows: Vec<Value> = ctx
-        .backend
-        .hosts()
-        .into_iter()
-        .map(|h| match ctx.backend.call(&h, "workspace.list", json!({}), Duration::from_secs(8)) {
-            Ok(v) => json!({"host":h,"reachable":true,"workspaces":v.get("workspaces").and_then(|w| w.as_array()).map(|w| w.len()).unwrap_or(0)}),
-            Err(e) => json!({"host":h,"reachable":false,"error":e}),
-        })
-        .collect();
+    // one thread per host: the tunnels open in parallel
+    let rows: Vec<Value> = std::thread::scope(|s| {
+        let hs: Vec<_> = ctx
+            .backend
+            .hosts()
+            .into_iter()
+            .map(|h| {
+                s.spawn(move || match ctx.backend.call(&h, "workspace.list", json!({}), Duration::from_secs(8)) {
+                    Ok(v) => json!({"host":h,"reachable":true,"workspaces":v.get("workspaces").and_then(|w| w.as_array()).map(|w| w.len()).unwrap_or(0)}),
+                    Err(e) => json!({"host":h,"reachable":false,"error":e}),
+                })
+            })
+            .collect();
+        hs.into_iter().map(|h| h.join().unwrap()).collect()
+    });
     Ok(json!({"hosts":rows}))
 }
 

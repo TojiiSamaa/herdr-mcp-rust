@@ -118,7 +118,7 @@ mod real {
                         .get_mut(host)
                         .map(|c| matches!(c.try_wait(), Ok(None)))
                         .unwrap_or(false);
-                    if !alive || !std::path::Path::new(&local).exists() {
+                    if !alive {
                         if let Some(mut old) = t.remove(host) {
                             let _ = old.kill();
                             let _ = old.wait();
@@ -148,12 +148,14 @@ mod real {
                             .spawn()
                             .map_err(|e| format!("ssh_spawn_failed: {e}"))?;
                         t.insert(host.to_string(), child);
-                        for _ in 0..50 {
-                            if std::path::Path::new(&local).exists() {
-                                break;
-                            }
-                            std::thread::sleep(Duration::from_millis(100));
+                    }
+                    // release the lock before waiting: other hosts must not queue behind this one
+                    drop(t);
+                    for _ in 0..500 {
+                        if std::path::Path::new(&local).exists() {
+                            break;
                         }
+                        std::thread::sleep(Duration::from_millis(10));
                     }
                     Ok(local)
                 }

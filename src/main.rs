@@ -89,6 +89,14 @@ fn main() {
         panes: Mutex::new(HashMap::new()),
     });
 
+    // warm the tunnels while the client is still handshaking (real backend only)
+    if !ctx.cfg.test_mode {
+        let c = ctx.clone();
+        std::thread::spawn(move || {
+            let _ = tools::call(&c, "hosts_list", &json!({}));
+        });
+    }
+
     for line in std::io::stdin().lock().lines() {
         let Ok(line) = line else { break };
         let Ok(msg) = serde_json::from_str::<Value>(&line) else {
