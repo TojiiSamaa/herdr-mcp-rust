@@ -198,3 +198,38 @@ fn every_listed_tool_has_a_strict_schema() {
         assert!(!t["description"].as_str().unwrap().is_empty());
     }
 }
+
+#[test]
+fn host_notes_and_aliases() {
+    let dir = std::env::temp_dir().join(format!("hm-meta-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let f = dir.join("hosts.json");
+    std::fs::write(
+        &f,
+        r#"{"hosts":{"alpha":{"socket":"/nonexistent/a.sock","description":"main box","default_dir":"/srv","group":"lab","aliases":["a1","old-a"]}}}"#,
+    )
+    .unwrap();
+    let f = f.display().to_string();
+    let mut env = TEST.to_vec();
+    env.push(("HERDR_MCP_HOSTS", &f));
+    let mut m = Mcp::start(&env);
+    let (r, err) = m.tool("hosts_list", json!({}));
+    assert!(!err, "{r}");
+    let h = &r["hosts"][0];
+    assert_eq!(h["host"], "alpha");
+    assert_eq!(h["description"], "main box");
+    assert_eq!(h["group"], "lab");
+    assert_eq!(h["aliases"][1], "old-a");
+    // an alias reaches the same host, and the answer names the real host
+    let (r, err) = m.tool(
+        "exec",
+        json!({"host":"old-a","project":"demo","command":"true"}),
+    );
+    assert!(!err, "{r}");
+    assert_eq!(r["host"], "alpha");
+    let (r, _) = m.tool(
+        "exec",
+        json!({"host":"nope","project":"demo","command":"true"}),
+    );
+    assert_eq!(r["error"], "unknown_host");
+}

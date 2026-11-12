@@ -19,6 +19,7 @@ pub struct Ctx {
     pending: Mutex<HashMap<String, mpsc::Sender<Value>>>,
     locks: Mutex<HashMap<String, Arc<Mutex<()>>>>,
     pub panes: Mutex<HashMap<String, String>>,
+    pub meta: HashMap<String, Value>,
 }
 
 static SEQ: AtomicU64 = AtomicU64::new(0);
@@ -87,6 +88,7 @@ fn main() {
         pending: Mutex::new(HashMap::new()),
         locks: Mutex::new(HashMap::new()),
         panes: Mutex::new(HashMap::new()),
+        meta: backend::load_meta().into_iter().collect(),
     });
 
     // warm the tunnels while the client is still handshaking (real backend only)

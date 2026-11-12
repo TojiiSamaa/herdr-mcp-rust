@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" font-family="DIN Alternate, Bahnschrift, Segoe UI, Arial, sans-serif">
+<rect width="1200" height="520" fill="#0a0a0a"/><rect width="14" height="520" fill="#e5172a"/>
+<text x="70" y="64" fill="#e5172a" font-size="18" letter-spacing="6">COMPARATIF · MÉDIANE DE 20 ESSAIS</text>
+<text x="70" y="108" fill="#f2f2f2" font-size="38" font-weight="700">Exécuter une commande à distance</text>
+<g font-size="17" fill="#9a9a9a" letter-spacing="2"><text x="70" y="168">MÉTHODE</text><text x="500" y="168">MACHINE PRINCIPALE</text><text x="720" y="168">MACHINE DISTANTE</text><text x="940" y="168">CODE DE SORTIE</text></g>
+<rect x="70" y="182" width="1070" height="2" fill="#e5172a"/>
+<g font-size="21" fill="#e6e6e6">
+<rect x="70" y="196" width="1070" height="56" fill="#111"/>
+<text x="86" y="232">SSH standard, un ssh par commande</text><text x="500" y="232" font-weight="700">770 ms</text><text x="720" y="232" font-weight="700">691 ms</text><text x="940" y="232" fill="#9a9a9a">non</text>
+<text x="86" y="294">Script tmux (une session par appel)</text><text x="500" y="294" font-weight="700">3500 ms</text><text x="720" y="294" fill="#9a9a9a">non mesuré</text><text x="940" y="294" fill="#9a9a9a">non</text>
+<rect x="70" y="320" width="1070" height="56" fill="#111"/>
+<text x="86" y="356">MCP Node (ssh-manager)</text><text x="500" y="356" font-weight="700">297 ms</text><text x="720" y="356" font-weight="700">275 ms</text><text x="940" y="356" fill="#9a9a9a">oui</text>
+<rect x="70" y="382" width="1070" height="56" fill="#1a0b0d"/><rect x="70" y="382" width="5" height="56" fill="#e5172a"/>
+<text x="86" y="418" fill="#fff" font-weight="700">MCP Rust (herdr-mcp)</text><text x="500" y="418" fill="#e5172a" font-weight="700">124 ms</text><text x="720" y="418" fill="#e5172a" font-weight="700">215 ms</text><text x="940" y="418" fill="#fff">oui</text>
+</g>
+<text x="70" y="478" fill="#9a9a9a" font-size="15">Mesuré depuis un PC Windows sur un réseau privé. Plus court = mieux. Un seul passage, un seul réseau.</text>
+</svg>

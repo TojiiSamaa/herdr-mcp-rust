@@ -71,12 +71,14 @@ Host file (`HERDR_MCP_HOSTS`):
 ```json
 {"hosts": {
   "local": {"socket": "/home/me/.config/herdr/herdr.sock"},
-  "build": {"ssh": "me@build.example.org", "remote_socket": "/home/me/.config/herdr/herdr.sock"}
+  "build": {"ssh": "me@build.example.org", "remote_socket": "/home/me/.config/herdr/herdr.sock",
+            "description": "CI builder", "default_dir": "/srv/ci", "group": "lab", "aliases": ["ci"]}
 }}
 ```
 
 - A `socket` host is a local Herdr Unix socket.
 - An `ssh` host gets **one** long-lived `ssh -N -L` tunnel to the remote Herdr socket (key-based, `BatchMode`), opened on first use and reused by every call. No shell is opened per command.
+- Optional notes per host, returned by `hosts_list`: `description`, `group`, `default_dir` (the starting directory of a new session) and `aliases` (any tool accepts an alias as `host`, the answer names the real host). The host file is thus the inventory.
 - Without a host file there is a single host, `local`, on the default socket.
 
 ## Use with a client

@@ -44,8 +44,19 @@ fn need<'a>(a: &'a Value, k: &str) -> Result<&'a str, (&'static str, String)> {
 }
 fn host_ok(ctx: &Ctx, a: &Value) -> Result<String, (&'static str, String)> {
     let h = need(a, "host")?;
-    if ctx.backend.hosts().iter().any(|x| x == h) {
-        Ok(h.to_string())
+    let hosts = ctx.backend.hosts();
+    // a host answers to its name or to one of its aliases
+    let name = hosts.iter().find(|x| x.as_str() == h).or_else(|| {
+        hosts.iter().find(|x| {
+            ctx.meta
+                .get(x.as_str())
+                .and_then(|m| m.get("aliases"))
+                .and_then(|a| a.as_array())
+                .is_some_and(|a| a.iter().any(|s| s.as_str() == Some(h)))
+        })
+    });
+    if let Some(n) = name {
+        Ok(n.clone())
     } else {
         Err((
             "unknown_host",
@@ -110,6 +121,16 @@ fn hosts_list(ctx: &Ctx) -> R {
             .collect();
         hs.into_iter().map(|h| h.join().unwrap()).collect()
     });
+    let rows = rows
+        .into_iter()
+        .map(|mut r| {
+            let meta = r["host"].as_str().and_then(|h| ctx.meta.get(h));
+            if let (Some(Value::Object(m)), Some(o)) = (meta, r.as_object_mut()) {
+                o.extend(m.clone());
+            }
+            r
+        })
+        .collect::<Vec<_>>();
     Ok(json!({"hosts":rows}))
 }
 
@@ -186,7 +207,15 @@ fn lookup_pane(ctx: &Ctx, host: &str, project: &str) -> Result<String, (&'static
         ctx,
         host,
         "workspace.create",
-        json!({"label":format!("claude-{project}"),"focus":false}),
+        match ctx
+            .meta
+            .get(host)
+            .and_then(|m| m.get("default_dir"))
+            .and_then(|d| d.as_str())
+        {
+            Some(d) => json!({"label":format!("claude-{project}"),"focus":false,"cwd":d}),
+            None => json!({"label":format!("claude-{project}"),"focus":false}),
+        },
         t,
     )?;
     v.pointer("/root_pane/pane_id")

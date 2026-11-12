@@ -11,7 +11,7 @@ MCP server (stdio) over [Herdr](https://github.com/herdrdev/herdr). One persiste
 
 | Tool | Role | Writes | Admin validation |
 |---|---|---|---|
-| `hosts_list` | Hosts configured and whether their Herdr server answers | no | no |
+| `hosts_list` | Hosts configured (with their description, group, default_dir and aliases when the host file has them) and whether their Herdr server answers | no | no |
 | `sessions_list` | Workspaces on one host or all; `managed:true` = created by `exec` (`claude-<project>`) | no | no |
 | `exec` | Run a command in `claude-<project>`; returns `exit_code`, `output`, `timed_out`, `truncated`, `pane_id` | yes | no (needs `HERDR_MCP_ALLOW_EXEC=1`) |
 | `pane_read` | Last N lines of a pane (follow a command that timed out) | no | no |

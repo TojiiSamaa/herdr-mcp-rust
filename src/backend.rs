@@ -72,6 +72,31 @@ pub fn load_hosts() -> BTreeMap<String, Target> {
     m
 }
 
+/// Optional per-host notes from the same file: description, default_dir, group, aliases.
+pub fn load_meta() -> BTreeMap<String, Value> {
+    let parsed = std::env::var("HERDR_MCP_HOSTS")
+        .ok()
+        .and_then(|p| std::fs::read_to_string(p).ok())
+        .and_then(|s| serde_json::from_str::<Value>(&s).ok());
+    let mut m = BTreeMap::new();
+    if let Some(h) = parsed
+        .as_ref()
+        .and_then(|v| v.get("hosts"))
+        .and_then(|h| h.as_object())
+    {
+        for (name, c) in h {
+            let mut o = serde_json::Map::new();
+            for k in ["description", "default_dir", "group", "aliases"] {
+                if let Some(v) = c.get(k) {
+                    o.insert(k.into(), v.clone());
+                }
+            }
+            m.insert(name.clone(), Value::Object(o));
+        }
+    }
+    m
+}
+
 pub fn select(cfg: &Config, stats: Arc<Stats>) -> Box<dyn Backend> {
     let hosts = load_hosts();
     if cfg.test_mode {

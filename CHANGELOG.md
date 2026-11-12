@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.0]
+- Host file notes: `description`, `group`, `default_dir`, `aliases` per host. `hosts_list` returns them, every tool accepts an alias as `host`, a new session starts in `default_dir`. The host file becomes the inventory of the fleet.
+
 ## [1.0.3]
 - Tunnels to remote hosts open in parallel, in the background at startup, and no longer block each other (the lock is released while waiting for the socket; polling every 10 ms instead of 100 ms). Cold `hosts_list`: 706 ms to 105 ms.
 

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" font-family="DIN Alternate, Bahnschrift, Segoe UI, Arial, sans-serif">
+<rect width="1200" height="640" fill="#0a0a0a"/>
+<rect x="0" y="0" width="14" height="640" fill="#e5172a"/>
+<text x="70" y="70" fill="#e5172a" font-size="18" letter-spacing="6">LATENCE D'UNE COMMANDE · MÉDIANE DE 20 ESSAIS</text>
+<text x="70" y="118" fill="#f2f2f2" font-size="42" font-weight="700">SSH standard, MCP Node, MCP Rust</text>
+<text x="70" y="150" fill="#9a9a9a" font-size="18">Mesuré depuis un PC Windows sur un réseau privé. Plus court = mieux.</text>
+
+<text x="70" y="215" fill="#f2f2f2" font-size="22" font-weight="700">Machine principale</text>
+<g font-size="18" fill="#cfcfcf">
+<text x="70" y="262">SSH standard (un ssh par commande)</text>
+<rect x="470" y="244" width="616" height="26" fill="#5b5b5b"/><text x="1096" y="264" fill="#f2f2f2" font-weight="700">770 ms</text>
+<text x="70" y="306">MCP Node (ssh-manager)</text>
+<rect x="470" y="288" width="238" height="26" fill="#8a8a8a"/><text x="718" y="308" fill="#f2f2f2" font-weight="700">297 ms</text>
+<text x="70" y="350">MCP Rust (herdr-mcp)</text>
+<rect x="470" y="332" width="99" height="26" fill="#e5172a"/><text x="579" y="352" fill="#f2f2f2" font-weight="700">124 ms</text>
+</g>
+
+<text x="70" y="425" fill="#f2f2f2" font-size="22" font-weight="700">Machine distante</text>
+<g font-size="18" fill="#cfcfcf">
+<text x="70" y="472">SSH standard (un ssh par commande)</text>
+<rect x="470" y="454" width="553" height="26" fill="#5b5b5b"/><text x="1033" y="474" fill="#f2f2f2" font-weight="700">691 ms</text>
+<text x="70" y="516">MCP Node (ssh-manager)</text>
+<rect x="470" y="498" width="220" height="26" fill="#8a8a8a"/><text x="700" y="518" fill="#f2f2f2" font-weight="700">275 ms</text>
+<text x="70" y="560">MCP Rust (herdr-mcp)</text>
+<rect x="470" y="542" width="172" height="26" fill="#e5172a"/><text x="652" y="562" fill="#f2f2f2" font-weight="700">215 ms</text>
+</g>
+
+<text x="70" y="602" fill="#9a9a9a" font-size="15">Hors échelle : un script qui ouvre une session tmux par appel mesure 3500 ms. Le SSH standard monte parfois à 2-3 s (session PAM rouverte à chaque commande).</text>
+<text x="70" y="624" fill="#9a9a9a" font-size="15">Un seul passage, un seul réseau.</text>
+</svg>
