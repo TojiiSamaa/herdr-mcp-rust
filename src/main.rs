@@ -18,6 +18,7 @@ pub struct Ctx {
     out: Mutex<std::io::Stdout>,
     pending: Mutex<HashMap<String, mpsc::Sender<Value>>>,
     locks: Mutex<HashMap<String, Arc<Mutex<()>>>>,
+    pub panes: Mutex<HashMap<String, String>>,
 }
 
 static SEQ: AtomicU64 = AtomicU64::new(0);
@@ -85,6 +86,7 @@ fn main() {
         out: Mutex::new(std::io::stdout()),
         pending: Mutex::new(HashMap::new()),
         locks: Mutex::new(HashMap::new()),
+        panes: Mutex::new(HashMap::new()),
     });
 
     for line in std::io::stdin().lock().lines() {

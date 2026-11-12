@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.2]
+- `exec` makes 2 Herdr calls instead of 5: the pane id is cached (looked up again once if stale) and the text returned by the wait is reused instead of a second read. Remote host: 528 ms to 215 ms.
+
 ## [1.0.1]
 - Version reported by `serverInfo` now matches the release (it said 0.1.0).
 - Real before/after benchmark (`bench/`), README and Discord preview, SECURITY / CONTRIBUTING / CODE_OF_CONDUCT / NOTICE.

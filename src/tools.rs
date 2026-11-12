@@ -160,6 +160,15 @@ fn find_workspace(
 }
 
 fn ensure_pane(ctx: &Ctx, host: &str, project: &str) -> Result<String, (&'static str, String)> {
+    let p = lookup_pane(ctx, host, project)?;
+    ctx.panes
+        .lock()
+        .unwrap()
+        .insert(format!("{host}/{project}"), p.clone());
+    Ok(p)
+}
+
+fn lookup_pane(ctx: &Ctx, host: &str, project: &str) -> Result<String, (&'static str, String)> {
     let t = Duration::from_secs(15);
     if let Some(ws) = find_workspace(ctx, host, project)? {
         let v = herdr(ctx, host, "pane.list", json!({"workspace_id":ws}), t)?;
@@ -245,20 +254,33 @@ fn exec(ctx: &Ctx, a: &Value) -> R {
 
     let lock = ctx.lock_for(&format!("{host}/{project}"));
     let _g = lock.lock().unwrap();
-    let pane = ensure_pane(ctx, &host, &project)?;
+    let key = format!("{host}/{project}");
+    let cached = ctx.panes.lock().unwrap().get(&key).cloned();
+    let mut pane = match cached {
+        Some(p) => p,
+        None => ensure_pane(ctx, &host, &project)?,
+    };
     let id = new_id();
     // The typed line shows `%s`/`$?`, never a digit: only the real output matches the end marker.
     let text = format!(
         "printf '__HM_{id}_S__\\n'; eval \"$(printf %s {} | base64 -d)\"; printf '__HM_{id}_E_%s__\\n' $?",
         b64(cmd.as_bytes())
     );
-    herdr(
-        ctx,
-        &host,
-        "pane.send_input",
-        json!({"pane_id":pane,"text":text,"keys":["Enter"]}),
-        Duration::from_secs(10),
-    )?;
+    let send = |pane: &str| {
+        herdr(
+            ctx,
+            &host,
+            "pane.send_input",
+            json!({"pane_id":pane,"text":text,"keys":["Enter"]}),
+            Duration::from_secs(10),
+        )
+    };
+    if send(&pane).is_err() {
+        // stale cached pane (session closed): look it up again, once
+        ctx.panes.lock().unwrap().remove(&key);
+        pane = ensure_pane(ctx, &host, &project)?;
+        send(&pane)?;
+    }
     let wait = ctx.backend.call(
         &host,
         "pane.wait_for_output",
@@ -277,13 +299,17 @@ fn exec(ctx: &Ctx, a: &Value) -> R {
         }
         Err(e) => return Err(("herdr_error", e.clone())),
     };
-    let read = herdr(
-        ctx,
-        &host,
-        "pane.read",
-        json!({"pane_id":pane,"source":"recent_unwrapped","lines":3000,"format":"text","strip_ansi":true}),
-        Duration::from_secs(10),
-    )?;
+    // a matched wait already carries the text; read again only after a timeout
+    let read = match wait.ok().filter(|w| w.pointer("/read/text").is_some()) {
+        Some(w) => w,
+        None => herdr(
+            ctx,
+            &host,
+            "pane.read",
+            json!({"pane_id":pane,"source":"recent_unwrapped","lines":3000,"format":"text","strip_ansi":true}),
+            Duration::from_secs(10),
+        )?,
+    };
     let txt = read
         .pointer("/read/text")
         .and_then(|t| t.as_str())
@@ -397,6 +423,10 @@ fn session_close(ctx: &Ctx, a: &Value) -> R {
         json!({"workspace_id":ws}),
         Duration::from_secs(10),
     )?;
+    ctx.panes
+        .lock()
+        .unwrap()
+        .remove(&format!("{host}/{project}"));
     Ok(json!({"host":host,"project":project,"found":true,"closed":true}))
 }
 

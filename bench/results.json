@@ -5,11 +5,45 @@
   "avant_nom": "ssh-manager (Node MCP)",
   "apres_nom": "herdr-mcp (Rust)",
   "lignes": [
-    { "metrique": "exec `true`, hub host (median)", "avant": 297, "apres": 130, "unite": "ms", "moins_est_mieux": true, "note": "range 279-313 vs 114-231. A shell script that opens a tmux session per call (tsh.sh) measured 3500 ms median." },
-    { "metrique": "exec `true`, second host (median)", "avant": 275, "apres": 528, "unite": "ms", "moins_est_mieux": true, "note": "herdr-mcp is slower here: every call crosses the ssh tunnel several times. Not optimised yet." },
-    { "metrique": "First call (connection and session creation)", "avant": 1191, "apres": 525, "unite": "ms", "moins_est_mieux": true, "note": "hub host" },
-    { "metrique": "Start to first tools/list", "avant": 724, "apres": 1067, "unite": "ms", "moins_est_mieux": true, "note": "herdr-mcp includes the ssh handshake to the hub; ssh-manager starts locally" },
-    { "metrique": "Memory of the MCP process (peak)", "avant": 90, "apres": 2.7, "unite": "Mo", "moins_est_mieux": true, "note": "Node working set vs Rust RSS; the client also keeps one ssh.exe of about 11.5 MB" },
-    { "metrique": "Installed size", "avant": 33, "apres": 0.65, "unite": "Mo", "moins_est_mieux": true, "note": "npm package folder vs one release binary (648 kB)" }
+    {
+      "metrique": "exec `true`, hub host (median)",
+      "avant": 297,
+      "apres": 124,
+      "unite": "ms",
+      "moins_est_mieux": true,
+      "note": "range 279-313 vs 110-217. A shell script that opens a tmux session per call (tsh.sh) measured 3500 ms median."
+    },
+    {
+      "metrique": "exec `true`, second host (median)",
+      "avant": 275,
+      "apres": 215,
+      "unite": "ms",
+      "moins_est_mieux": true,
+      "note": "range 210-234. Before 1.0.2 this was 528 ms: each call did 5 round trips through the tunnel, now 2 (pane id cached, wait result reused)."
+    },
+    {
+      "metrique": "Start to first tools/list",
+      "avant": 724,
+      "apres": 463,
+      "unite": "ms",
+      "moins_est_mieux": true,
+      "note": "one run; 463 to 1067 ms seen across runs (ssh handshake to the hub). A long-lived mux pays it once."
+    },
+    {
+      "metrique": "Memory of the MCP process (peak)",
+      "avant": 90,
+      "apres": 2.7,
+      "unite": "Mo",
+      "moins_est_mieux": true,
+      "note": "Node working set vs Rust RSS; the client also keeps one ssh.exe of about 11.5 MB"
+    },
+    {
+      "metrique": "Installed size",
+      "avant": 33,
+      "apres": 0.65,
+      "unite": "Mo",
+      "moins_est_mieux": true,
+      "note": "npm package folder vs one release binary (648 kB)"
+    }
   ]
 }

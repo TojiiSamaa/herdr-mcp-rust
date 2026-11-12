@@ -3,10 +3,9 @@
 <!-- stats:debut -->
 | | ssh-manager (Node MCP) | `herdr-mcp (Rust)` | Ratio | Note |
 |---|---|---|---|---|
-| exec `true`, hub host (median) | 297 ms | 130 ms | 2.3x better | range 279-313 vs 114-231. A shell script that opens a tmux session per call (tsh.sh) measured 3500 ms median. |
-| exec `true`, second host (median) | 275 ms | 528 ms | 1.9x worse | herdr-mcp is slower here: every call crosses the ssh tunnel several times. Not optimised yet. |
-| First call (connection and session creation) | 1191 ms | 525 ms | 2.3x better | hub host |
-| Start to first tools/list | 724 ms | 1067 ms | 1.5x worse | herdr-mcp includes the ssh handshake to the hub; ssh-manager starts locally |
+| exec `true`, hub host (median) | 297 ms | 124 ms | 2.4x better | range 279-313 vs 110-217. A shell script that opens a tmux session per call (tsh.sh) measured 3500 ms median. |
+| exec `true`, second host (median) | 275 ms | 215 ms | 1.3x better | range 210-234. Before 1.0.2 this was 528 ms: each call did 5 round trips through the tunnel, now 2 (pane id cached, wait result reused). |
+| Start to first tools/list | 724 ms | 463 ms | 1.6x better | one run; 463 to 1067 ms seen across runs (ssh handshake to the hub). A long-lived mux pays it once. |
 | Memory of the MCP process (peak) | 90 MB | 2.7 MB | 33.3x better | Node working set vs Rust RSS; the client also keeps one ssh.exe of about 11.5 MB |
 | Installed size | 33 MB | 0.65 MB | 50.8x better | npm package folder vs one release binary (648 kB) |
 | Report (20 trials, Client: Windows 11 PC over a private mesh VPN. Hub host: Linux x86_64 running Herdr 0.9.5 and herdr-mcp (reached by ssh over stdio). Second host: Linux x86_64 reached from the hub through one ssh tunnel to its Herdr socket. Before = the Node MCP ssh-manager started on the client (direct ssh to each host). Latency = median of 20 consecutive `true` commands after a first warm-up call. Single run, one network.) | [bench/results.json](bench/results.json) | [bench/chart.svg](bench/chart.svg) | | |
