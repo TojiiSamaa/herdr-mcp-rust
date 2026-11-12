@@ -1,0 +1,16 @@
+name: ci-tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+      # Mutation test: with a deliberate real call in test mode, the egress proof (B) MUST fail.
+      - name: egress proof must detect a leak
+        run: "! cargo test --features mutant --test egress b_zero_connections_zero_spawn_in_test_mode"

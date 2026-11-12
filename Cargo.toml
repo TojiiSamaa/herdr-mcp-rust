@@ -1,0 +1,20 @@
+[package]
+name = "herdr-mcp"
+version = "0.1.0"
+edition = "2021"
+description = "MCP server (stdio) that drives Herdr terminal sessions on one or many machines"
+license = "Apache-2.0"
+repository = "https://github.com/TojiiSamaa/herdr-mcp-rust" # scan:ok
+
+[features]
+# Mutation test only: adds a REAL socket call in test mode. The egress proof must then FAIL.
+mutant = []
+
+[dependencies]
+serde_json = "1"
+
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1
+panic = "abort"
